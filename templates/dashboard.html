@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETS2 Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+    <script>
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('speed').innerText = data.speed;
+                    document.getElementById('truck_type').innerText = data.truck_type;
+                    document.getElementById('fuel').innerText = data.fuel;
+                    document.getElementById('pressure').innerText = data.pressure;
+                    document.getElementById('condition').innerText = data.condition;
+                    document.getElementById('job_type').innerText = data.job_type;
+                    document.getElementById('remaining_time').innerText = data.remaining_time;
+
+                    updateSpeedometer(data.speed);
+                });
+        }
+
+        function updateSpeedometer(speed) {
+            const speedometer = document.getElementById('speedometer').getContext('2d');
+            new Chart(speedometer, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [speed, 120 - speed],
+                        backgroundColor: ['#4CAF50', '#EEEEEE'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    circumference: Math.PI,
+                    rotation: Math.PI,
+                    cutout: '80%',
+                    plugins: {
+                        tooltip: { enabled: false },
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+
+        setInterval(fetchData, 1000); // Fetch data every second
+    </script>
+    <style>
+        .speedometer-container {
+            position: relative;
+            width: 150px;
+            height: 75px;
+        }
+        .speedometer-container .speedometer-text {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 0;
+            text-align: center;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="fixed top-0 left-0 w-full bg-blue-600 text-white p-4 text-center font-bold">
+        ETS2 Dashboard
+    </header>
+    <main class="mt-20 mb-20 p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Speed</h2>
+                    <p class="text-gray-700"><span id="speed">0</span> km/h</p>
+                    <div class="speedometer-container">
+                        <canvas id="speedometer"></canvas>
+                        <div class="speedometer-text" id="speed-text">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-green-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Truck Type</h2>
+                    <p class="text-gray-700" id="truck_type">N/A</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-yellow-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-gas-pump"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Fuel</h2>
+                    <p class="text-gray-700"><span id="fuel">0</span> liters</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-red-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Oil Pressure</h2>
+                    <p class="text-gray-700"><span id="pressure">0</span> psi</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-indigo-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-wrench"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Condition</h2>
+                    <p class="text-gray-700"><span id="condition">0</span>%</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-purple-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Job Type</h2>
+                    <p class="text-gray-700" id="job_type">N/A</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow-md flex items-center">
+                <div class="w-12 h-12 bg-pink-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Remaining Time</h2>
+                    <p class="text-gray-700"><span id="remaining_time">0</span> minutes</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <nav class="fixed bottom-0 left-0 w-full bg-blue-600 text-white p-4 flex justify-around">
+        <a href="#" class="text-center">
+            <i class="fas fa-home"></i>
+            <span class="block text-sm">Home</span>
+        </a>
+        <a href="#" class="text-center">
+            <i class="fas fa-info-circle"></i>
+            <span class="block text-sm">Info</span>
+        </a>
+        <a href="#" class="text-center">
+            <i class="fas fa-cogs"></i>
+            <span class="block text-sm">Settings</span>
+        </a>
+    </nav>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>
